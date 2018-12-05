@@ -6,6 +6,8 @@ PG_LOG=/var/log/pgbouncer
 PG_CONFIG_DIR=/etc/pgbouncer
 PG_USER=postgres
 
+HOST=${DB_HOST:?"Setup pgbouncer config error! You must set DB_HOST env"}
+
 if [ ! -f ${PG_CONFIG_DIR}/pgbouncer.ini ]; then
   echo "create pgbouncer config in ${PG_CONFIG_DIR}"
   mkdir -p ${PG_CONFIG_DIR}
@@ -17,9 +19,7 @@ if [ ! -f ${PG_CONFIG_DIR}/pgbouncer.ini ]; then
 # Lines starting with “;” or “#” are taken as comments and ignored.
 # The characters “;” and “#” are not recognized when they appear later in the line.
 [databases]
-* = host=${DB_HOST:?"Setup pgbouncer config error! You must set DB_HOST env"} \
-port=${DB_PORT:-5432} user=${DB_USER:-postgres} \
-${DB_PASSWORD:+password=${DB_PASSWORD}}
+*= port=${DB_PORT:-5432} user=${DB_USER:-postgres} ${DB_PASSWORD:+password=${DB_PASSWORD}} host=${DB_HOST}
 
 [pgbouncer]
 # Generic settings
@@ -111,7 +111,7 @@ ${TCP_KEEPINTVL:+tcp_keepintvl = ${TCP_KEEPINTVL}\n}\
 " > ${PG_CONFIG_DIR}/pgbouncer.ini
 fi
 
-adduser ${PG_USER}
+adduser --disabled-password --gecos "" ${PG_USER}
 mkdir -p ${PG_LOG}
 chmod -R 755 ${PG_LOG}
 chown -R ${PG_USER}:${PG_USER} ${PG_LOG}
@@ -119,5 +119,5 @@ chown -R ${PG_USER}:${PG_USER} ${PG_LOG}
 if [ -z $QUIET ]; then
   cat ${PG_CONFIG_DIR}/pgbouncer.ini
 fi
-echo "Starting pgbouncer..."
+echo "Starting pgbouncer... 1.9.0"
 exec /pgbouncer/bin/pgbouncer ${QUIET:+-q} -u ${PG_USER} ${PG_CONFIG_DIR}/pgbouncer.ini

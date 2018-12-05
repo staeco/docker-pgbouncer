@@ -1,27 +1,41 @@
-FROM alpine:latest AS build_stage
-
-MAINTAINER brainsam@yandex.ru
+FROM debian:jessie AS build_stage
 
 WORKDIR /
-RUN apk --update add git python py-pip build-base automake libtool m4 autoconf libevent-dev openssl-dev c-ares-dev
+RUN apt update && apt -y --no-install-recommends install \
+        automake \
+        build-essential \
+        ca-certificates \
+        git \
+        python-pip python-dev \
+        python-docutils \
+        libc-ares2 \
+        libc-ares-dev \
+        libev4 \
+        libev-dev \
+        libevent-2.0-5 \
+        libevent-dev \
+        libssl1.0.0 \
+        libssl-dev \
+        libtool \
+        pkg-config
+
 RUN pip install docutils
 RUN git clone https://github.com/pgbouncer/pgbouncer.git src
 
 WORKDIR /bin
-RUN ln -s ../usr/bin/rst2man.py rst2man
 
 WORKDIR /src
 RUN mkdir /pgbouncer
 RUN git submodule init
 RUN git submodule update
 RUN ./autogen.sh
-RUN	./configure --prefix=/pgbouncer --with-libevent=/usr/lib
+RUN	./configure --prefix=/pgbouncer --with-libevent=/usr/lib --enable-evdns=no
 RUN make
 RUN make install
 RUN ls -R /pgbouncer
 
-FROM alpine:latest
-RUN apk --update add libevent openssl c-ares
+FROM debian:jessie
+RUN apt update && apt install libevent-2.0-5 openssl libc-ares2 -y
 WORKDIR /
 COPY --from=build_stage /pgbouncer /pgbouncer
 ADD entrypoint.sh ./
