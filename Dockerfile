@@ -17,7 +17,8 @@ RUN apt update && apt -y --no-install-recommends install \
         libssl1.0.0 \
         libssl-dev \
         libtool \
-        pkg-config
+        pkg-config \
+        psmisc
 
 RUN pip install docutils
 RUN git clone https://github.com/pgbouncer/pgbouncer.git src
