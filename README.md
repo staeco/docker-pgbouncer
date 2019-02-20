@@ -1,7 +1,5 @@
 ## Synopsis
 
-> Replica support is on branch `replica`
-
 **pgbouncer** is a popular, small connection pooler for Postgresql. This is yet another docker image with pgbouncer, based on alpine.
 
 ## Code Example
