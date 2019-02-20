@@ -3,6 +3,7 @@ FROM debian:jessie AS build_stage
 WORKDIR /
 RUN apt update && apt -y --no-install-recommends install \
         automake \
+        pandoc \
         build-essential \
         ca-certificates \
         git \
@@ -23,13 +24,13 @@ RUN apt update && apt -y --no-install-recommends install \
 RUN pip install docutils
 RUN git clone https://github.com/pgbouncer/pgbouncer.git src
 
-WORKDIR /bin
-
 WORKDIR /src
-RUN mkdir /pgbouncer
+RUN git checkout pgbouncer_1_9_0
 RUN git submodule init
 RUN git submodule update
 RUN ./autogen.sh
+
+RUN mkdir /pgbouncer
 RUN	./configure --prefix=/pgbouncer --with-libevent=/usr/lib --enable-evdns=no
 RUN make
 RUN make install
