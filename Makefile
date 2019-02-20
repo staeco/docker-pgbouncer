@@ -1,4 +1,7 @@
-NAME=staeco/pgbouncer:1.9.0-v2
+VERSION=$(shell git describe --always --long)
+TAG=1.9.0
+USER=staeco
+NAME=$(USER)/pgbouncer:$(TAG)-$(VERSION)
 
 all: docker
 
