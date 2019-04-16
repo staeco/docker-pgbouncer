@@ -1,5 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 # Based on https://raw.githubusercontent.com/brainsam/pgbouncer/master/entrypoint.sh
+
+# sentry hook for stderr
+echo "using SENTRY_DSN: ${SENTRY_DSN}"
+eval "$(sentry-cli bash-hook)"
 
 set -e
 
